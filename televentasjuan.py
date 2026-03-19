@@ -1,6 +1,6 @@
 """
 TeleVentas - Sistema de Compras a Distancia
-estudiante: Juan Moreno
+estudiante: Juan Camilo Moreno 
 """
  
 # Importamos las herramientas de phyton que necesitamos
@@ -20,4 +20,4 @@ logging.basicConfig(
     ],
 )
 log = logging.getLogger("TeleVentas")
- 
+  
