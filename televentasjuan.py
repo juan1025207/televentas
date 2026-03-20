@@ -40,10 +40,21 @@ class Producto : #creamos el objeto "producto"
       self.nombre = nombre
       self.precio = precio
       self.stock = stock
-    #valores que queremos mostrar
+    #valores que queremos mostrar.
    def mostrar (self):
       print(f"  [{self.codigo}] {self.nombre} - ${self.precio} (stock: {self.stock})")
+
+class Cliente:
+    def __init__(self, nombre, email):
+        self.nombre = nombre
+        self.email = email
+        self.recibe_catalogo = False
+
+    def suscribirse(self):
+        self.recibe_catalogo = True
+        log.info("Cliente %s se suscribio al catalogo", self.email)
  
+
    
 
  
