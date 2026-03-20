@@ -115,4 +115,33 @@ class Queja:
         log.info("Queja registrada | id=%s | cliente=%s", self.id, cliente.email)
 
  
-  
+class Inventario:
+    def __init__(self):
+        self.productos = {}  #Productos por código
+        log.info("Inventario iniciado")
+
+    def agregar(self, producto):
+        self.productos[producto.codigo] = producto  #Agregar producto
+
+    def buscar(self, codigo): 
+        producto = self.productos.get(codigo)
+        if not producto:
+            print(f"Producto {codigo} no encontrado")
+        return producto
+
+    def mostrar_catalogo(self):# Se muestra el producto
+        print("\nCatalogo de productos:")
+        for p in self.productos.values():
+            p.mostrar()
+
+    def descontar_stock(self, codigo, cantidad):
+        producto = self.productos.get(codigo)
+        if not producto:
+            print(f"Producto {codigo} no existe")
+            return False
+        if producto.stock < cantidad:
+            print(f"No hay suficiente stock de {producto.nombre}")
+            return False
+        producto.stock -= cantidad  # restar stock
+        log.info("Stock actualizado | %s | nuevo stock: %d", codigo, producto.stock)
+        return True
