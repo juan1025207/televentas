@@ -203,3 +203,57 @@ class GestorQuejas:
         self.quejas.append(queja)  # guarda queja
         self.correo.avisar_gerente(queja)  # notifica al gerente
         return queja  # devuelve la queja
+
+class Transporte:
+    def __init__(self, nombre):
+        self.nombre = nombre
+
+    def entregar(self, orden):
+        log.info("Entrega a cargo de %s | orden %s", self.nombre, orden.id)
+        orden.despachar()
+class Agente:
+    def __init__(self, gestor, transportes):
+        self.gestor = gestor
+        self.transportes = transportes
+
+    def ver_ordenes(self):
+        ordenes = self.gestor.ordenes_confirmadas()
+        print(f"\nOrdenes pendientes de armado: {len(ordenes)}")
+        return ordenes
+
+    def procesar_orden(self, orden_id, indice_transporte=0):
+        ok = self.gestor.armar_orden(orden_id)
+        if not ok:
+            return False
+        orden = self.gestor.ordenes[orden_id]
+        transporte = self.transportes[indice_transporte]
+        transporte.entregar(orden)
+        return True
+
+class Transporte:
+    def __init__(self, nombre):
+        self.nombre = nombre  #nombre de la empresa
+
+    def entregar(self, orden):
+        log.info("Entrega a cargo de %s | orden %s", self.nombre, orden.id)  # registra envío
+        orden.despachar()  #marca como despachada
+
+
+class Agente:
+    def __init__(self, gestor, transportes):
+        self.gestor = gestor   # gestor de órdenes
+        self.transportes = transportes  #lista de transportes
+
+    def ver_ordenes(self):
+        ordenes = self.gestor.ordenes_confirmadas()  #obtiene órdenes confirmadas
+        print(f"\nOrdenes pendientes de armado: {len(ordenes)}")
+        return ordenes
+
+    def procesar_orden(self, orden_id, indice_transporte=0):
+        ok = self.gestor.armar_orden(orden_id)  #intenta armar orden
+        if not ok:
+            return False
+        orden = self.gestor.ordenes[orden_id]  #btiene la orden
+        transporte = self.transportes[indice_transporte]  #selecciona transporte
+        transporte.entregar(orden)  #envía la orden
+        return True
