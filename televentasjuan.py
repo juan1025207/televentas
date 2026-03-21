@@ -145,3 +145,61 @@ class Inventario:
         producto.stock -= cantidad  # restar stock
         log.info("Stock actualizado | %s | nuevo stock: %d", codigo, producto.stock)
         return True
+    
+# clase correo
+class Correo:
+    def enviar_catalogo(self, cliente, inventario):
+        log.info("Catalogo enviado %s", cliente.email)  # envío de catálogo
+    
+    def avisar_gerente(self, queja):
+        log.info("Queja %s enviada ala gerente", queja.id)  # notifica queja
+
+# clase gestor ordenes 
+class GestorOrdenes:
+    def __init__(self, inventario):
+        self.inventario = inventario  # referencia al inventario
+        self.ordenes = {}  # guarda órdenes por id
+
+    def crear_orden(self, cliente, items, tipo_pago):
+        for item in items:
+            prod = self.inventario.buscar(item.producto.codigo)  # verifica producto
+            if not prod or prod.stock < item.cantidad:
+                print("No hay stock suficiente para crear la orden")
+                return None
+        orden = OrdenCompra(cliente, items, tipo_pago)  # crea orden
+        orden.confirmar()  # confirma orden
+        self.ordenes[orden.id] = orden  # guarda orden
+        return orden
+
+    def cancelar_orden(self, orden_id):
+        orden = self.ordenes.get(orden_id)  # busca orden
+        if orden:
+            orden.cancelar()  # cancela orden
+
+    def ordenes_confirmadas(self):
+        resultado = []
+        for orden in self.ordenes.values():
+            if orden.estado == EstadoOrden.CONFIRMADA:
+                resultado.append(orden)  # agrega confirmadas
+        return resultado
+
+    def armar_orden(self, orden_id):
+        orden = self.ordenes.get(orden_id)  # busca orden
+        if not orden:
+            print("Orden no encontrada")
+            return False
+        for item in orden.items:
+            self.inventario.descontar_stock(item.producto.codigo, item.cantidad)  # descuenta stock
+        orden.armar()  # marca como armada
+        return True
+
+class GestorQuejas:
+    def __init__(self, correo):
+        self.correo = correo  # servicio de correo
+        self.quejas = []  # lista de quejas
+
+    def registrar(self, cliente, descripcion):
+        queja = Queja(cliente, descripcion)  # crea queja
+        self.quejas.append(queja)  # guarda queja
+        self.correo.avisar_gerente(queja)  # notifica al gerente
+        return queja  # devuelve la queja
