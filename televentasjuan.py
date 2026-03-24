@@ -257,3 +257,63 @@ class Agente:
         transporte = self.transportes[indice_transporte]  #selecciona transporte
         transporte.entregar(orden)  #envía la orden
         return True
+
+#METODO MAIN
+def main():
+    print("=== Sistema TeleVentas ===\n")
+
+    inventario = Inventario()  #  inventario
+    inventario.agregar(Producto("P001", "Televisor 55 pulgadas", 1500, 10))  #agregar producto
+    inventario.agregar(Producto("P002", "Auriculares Bluetooth", 80, 50))
+    inventario.agregar(Producto("P003", "Control Remoto", 25, 100))
+
+    inventario.mostrar_catalogo()  #Mostrar catálogo
+
+    correo = Correo()  #ervicio de correo
+    gestor_ordenes = GestorOrdenes(inventario)  #gestor de órdenes
+    gestor_quejas = GestorQuejas(correo)  #gestor de quejas
+    transportes = [
+        Transporte("TransRapido S.A."),
+        Transporte("LogiExpress")
+    ]
+    agente = Agente(gestor_ordenes, transportes)  #agente de depósito
+
+    print("\n--- Ana realiza una compra ---")
+    ana = Cliente("Ana Garcia", "ana@email.com")  #crear cliente
+    ana.suscribirse()  #suscribirse al catálogo
+    correo.enviar_catalogo(ana, inventario)  #enviar catálogo
+
+    producto1 = inventario.buscar("P001")  #buscar producto
+    item1 = ItemOrden(producto1, 2)  #crear ítem
+    orden1 = gestor_ordenes.crear_orden(ana, [item1], TipoPago.TARJETA)  #crear orden
+
+    if orden1:
+        print(f"Orden creada: {orden1.id}")
+        print(f"Total a pagar: ${orden1.calcular_total()}")
+        print(f"Estado: {orden1.estado.value}")
+
+    print("\n--- Ana presenta una queja ---")
+    gestor_quejas.registrar(ana, "El paquete llego tarde")  #registrar queja
+
+    print("\n--- Agente procesa la orden ---")
+    ordenes = agente.ver_ordenes()  #ver órdenes
+    if ordenes:
+        agente.procesar_orden(ordenes[0].id, indice_transporte=0)  #procesar orden
+        print(f"Estado final: {ordenes[0].estado.value}")
+
+    print("\n--- Luis cancela su orden ---")
+    luis = Cliente("Luis Perez", "luis@email.com")  #crear cliente
+    producto2 = inventario.buscar("P002")  #buscar producto
+    item2 = ItemOrden(producto2, 1)  #crear ítem
+    orden2 = gestor_ordenes.crear_orden(luis, [item2], TipoPago.TARJETA)  #crear orden
+
+    if orden2:
+        print(f"Orden creada: {orden2.id}")
+        orden2.cancelar()  #cancelar orden
+        print(f"Estado: {orden2.estado.value}")
+
+    print("\n=== Fin del programa ===")
+
+
+if __name__ == "__main__":
+    main()  #se jecuta programa
